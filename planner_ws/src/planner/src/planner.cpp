@@ -6,19 +6,19 @@ MapUpdater mapUp;
 LaserScanProcessor laserProcessor;
 
 Planner::Planner(): Node("Planner") {
+    RCLCPP_INFO(this->get_logger(), "Node initialized!");
 
     laser = this->create_subscription<sensor_msgs::msg::LaserScan>(
         "/scan", 10, std::bind(&Planner::laserCallback, this, std::placeholders::_1));
-    local_grid_pub = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/local_map", 10);
-    global_grid_pub = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/global_map", 10);
-    path_pub = this->create_publisher<nav_msgs::msg::Path>("/planned_path", 10);
+    grid_pub = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/map", 10);
+    path_pub = this->create_publisher<nav_msgs::msg::Path>("/path", 10);
 
 };
 
 void Planner::laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr laser){
     nav_msgs::msg::OccupancyGrid grid = laserProcessor.processLaserScan(laser);
-    local_grid_pub->publish(grid);
     mapUp.updateGlobalMap(grid);
+    grid_pub->publish(mapUp.getGlobalMap());
     publishPath();
 };
 
@@ -46,7 +46,7 @@ std::vector<std::pair<int, int>> Planner::aStar(int start_x, int start_y, int go
 
         if (current.x == goal_x && current.y == goal_y) {
             std::vector<std::pair<int, int>> path;
-            for (int x = goal_x, y = goal_y; x != -1 && y != -1; std::tie(x, y) = parent[x][y]) {
+            for (int x = goal_x, y = goal_y; x != 0 && y != 0; std::tie(x, y) = parent[x][y]) {
             path.emplace_back(x, y);
             }
             std::reverse(path.begin(), path.end());
@@ -59,7 +59,7 @@ std::vector<std::pair<int, int>> Planner::aStar(int start_x, int start_y, int go
 
             int c = mapUp.getGlobalMap().data[ny * width + nx];
 
-            if ((nx >= 0 && nx < width && ny >= 0 && ny < height) && c >= 100) {
+            if ((nx >= 0 && nx < width && ny >= 0 && ny < height) && c < 100) {
                 double mc = (dx != 0 && dy != 0) ? 1.414 : 1.0; //diagonal movement costs more!
                 double new_cost = cost[current.x][current.y] + mc;
                 if (new_cost < cost[nx][ny]) {
@@ -80,6 +80,7 @@ void Planner::publishPath() {
 
     nav_msgs::msg::Path ros_path;
     ros_path.header.frame_id = "map";
+    ros_path.header.stamp = this->get_clock()->now();
     double resolution = mapUp.getResolution();
     for (auto [x, y] : path) {
         geometry_msgs::msg::PoseStamped pose;

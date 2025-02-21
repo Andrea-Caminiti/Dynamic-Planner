@@ -1,6 +1,8 @@
 #pragma once
 #include "nav_msgs/msg/occupancy_grid.hpp"
 
+#include <rclcpp/rclcpp.hpp>
+
 class MapUpdater
 {
 public:

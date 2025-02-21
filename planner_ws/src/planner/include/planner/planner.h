@@ -15,15 +15,14 @@ public:
 
 private:
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser;
-    rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr local_grid_pub;
-    rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr global_grid_pub;
+    rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr grid_pub;
     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub;
 
     //A* parameters
     const int start_x = 4;
     const int start_y = 4;
-    const int goal_x = 48;
-    const int goal_y = 49;
+    const int goal_x = 69;
+    const int goal_y = 75;
 
     void laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr scan);
     std::vector<std::pair<int, int>> aStar(int start_x, int start_y, int goal_x, int goal_y);

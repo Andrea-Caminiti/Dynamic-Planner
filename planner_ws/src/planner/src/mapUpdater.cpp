@@ -2,6 +2,9 @@
 
 MapUpdater::MapUpdater()
 {
+    rclcpp::Clock clock(RCL_SYSTEM_TIME);
+    global_map_.header.frame_id = "map";
+    global_map_.header.stamp = clock.now();
     global_map_.info.width = 100;
     global_map_.info.height = 100;
     global_map_.info.resolution = 0.1;
