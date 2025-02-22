@@ -19,8 +19,8 @@ nav_msgs::msg::OccupancyGrid LaserScanProcessor::processLaserScan(const sensor_m
         float range = scan->ranges[i];
         if (range < scan->range_max)
         {
-            int x = static_cast<int>((range * cos(angle)) / local_map.info.resolution) + 50;
-            int y = static_cast<int>((range * sin(angle)) / local_map.info.resolution) + 50;
+            int x = static_cast<int>((range * cos(angle)) / local_map.info.resolution);
+            int y = static_cast<int>((range * sin(angle)) / local_map.info.resolution);
             if (x >= 0 && x < 100 && y >= 0 && y < 100)
             {
                 local_map.data[y * 100 + x] = 100;

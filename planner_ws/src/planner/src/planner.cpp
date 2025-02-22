@@ -40,7 +40,7 @@ void Planner::createMarker(double x, double y) {
     int_marker.header.stamp = this->get_clock()->now();
     int_marker.name = "obstacle_marker";
     int_marker.description = "Obstacle";
-    int_marker.scale = 0.5;
+    int_marker.scale = 0.1;
     int_marker.pose.position.x = x;
     int_marker.pose.position.y = y;
     int_marker.pose.position.z = 0.0;
@@ -51,9 +51,9 @@ void Planner::createMarker(double x, double y) {
 
     visualization_msgs::msg::Marker marker;
     marker.type = visualization_msgs::msg::Marker::CUBE;
-    marker.scale.x = 0.5;
-    marker.scale.y = 0.5;
-    marker.scale.z = 0.0;
+    marker.scale.x = 0.1;
+    marker.scale.y = 0.1;
+    marker.scale.z = 0.1;
     marker.color.r = 1.0;
     marker.color.g = 0.0;
     marker.color.b = 0.0;

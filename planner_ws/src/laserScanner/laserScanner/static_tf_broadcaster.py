@@ -8,10 +8,7 @@ class StaticFramePublisher(Node):
     def __init__(self):
         super().__init__('static_tf_broadcaster')
 
-        # Create the TF broadcaster
         self.tf_broadcaster = StaticTransformBroadcaster(self)
-
-        # Publish static transforms
         self.publish_static_transforms()
 
     def publish_static_transforms(self):
@@ -35,7 +32,6 @@ class StaticFramePublisher(Node):
         base_to_laser.transform.translation.z = 0.3  # 30 cm above ground
         base_to_laser.transform.rotation.w = 1.0
 
-        # Broadcast both transforms
         self.tf_broadcaster.sendTransform([gmap_to_base, base_to_laser])
 
 
