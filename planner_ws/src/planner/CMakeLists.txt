@@ -21,11 +21,13 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(interactive_markers REQUIRED)
 
 include_directories(include)
 
 add_executable(planner src/planner.cpp src/main.cpp src/laserProcessor.cpp src/mapUpdater.cpp)
-ament_target_dependencies(planner rclcpp sensor_msgs nav_msgs geometry_msgs)
+ament_target_dependencies(planner rclcpp sensor_msgs nav_msgs geometry_msgs visualization_msgs interactive_markers)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

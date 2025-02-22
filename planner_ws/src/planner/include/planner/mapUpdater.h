@@ -8,7 +8,7 @@ class MapUpdater
 public:
     MapUpdater();
     void updateGlobalMap(const nav_msgs::msg::OccupancyGrid &local_map);
-    nav_msgs::msg::OccupancyGrid getGlobalMap() const;
+    nav_msgs::msg::OccupancyGrid getGlobalMap();
     int getWidth() const;
     int getHeight() const;
     double getResolution() const;

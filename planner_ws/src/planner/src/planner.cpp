@@ -6,12 +6,24 @@ MapUpdater mapUp;
 LaserScanProcessor laserProcessor;
 
 Planner::Planner(): Node("Planner") {
-    RCLCPP_INFO(this->get_logger(), "Node initialized!");
 
     laser = this->create_subscription<sensor_msgs::msg::LaserScan>(
         "/scan", 10, std::bind(&Planner::laserCallback, this, std::placeholders::_1));
     grid_pub = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/map", 10);
     path_pub = this->create_publisher<nav_msgs::msg::Path>("/path", 10);
+    marker_pose_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/marker_pose", 10);
+
+    marker_server_ = std::make_shared<interactive_markers::InteractiveMarkerServer>("obstacle_markers",
+        this->get_node_base_interface(),
+        this->get_node_clock_interface(),
+        this->get_node_logging_interface(),
+        this->get_node_topics_interface(),
+        this->get_node_services_interface()
+    );
+        
+    createMarker(0.0, 0.0);
+
+    marker_server_->applyChanges();
 
 };
 
@@ -21,6 +33,53 @@ void Planner::laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr laser){
     grid_pub->publish(mapUp.getGlobalMap());
     publishPath();
 };
+
+void Planner::createMarker(double x, double y) {
+    visualization_msgs::msg::InteractiveMarker int_marker;
+    int_marker.header.frame_id = "map";
+    int_marker.header.stamp = this->get_clock()->now();
+    int_marker.name = "obstacle_marker";
+    int_marker.description = "Obstacle";
+    int_marker.scale = 0.5;
+    int_marker.pose.position.x = x;
+    int_marker.pose.position.y = y;
+    int_marker.pose.position.z = 0.0;
+
+    visualization_msgs::msg::InteractiveMarkerControl control;
+    control.always_visible = true;
+    control.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_ROTATE_3D;
+
+    visualization_msgs::msg::Marker marker;
+    marker.type = visualization_msgs::msg::Marker::CUBE;
+    marker.scale.x = 0.5;
+    marker.scale.y = 0.5;
+    marker.scale.z = 0.0;
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
+
+    control.markers.push_back(marker);
+    int_marker.controls.push_back(control);
+
+    marker_server_->insert(int_marker);
+    marker_server_->setCallback(int_marker.name, std::bind(&Planner::processMarkerFeedback, this, std::placeholders::_1));
+}
+
+void Planner::processMarkerFeedback(const std::shared_ptr<const visualization_msgs::msg::InteractiveMarkerFeedback>& feedback) {
+    if (feedback->event_type == visualization_msgs::msg::InteractiveMarkerFeedback::POSE_UPDATE) {
+        
+        geometry_msgs::msg::PoseStamped marker_pose;
+        marker_pose.header.stamp = this->get_clock()->now();
+        marker_pose.header.frame_id = "map";  // Ensure frame matches your map
+
+        marker_pose.pose = feedback->pose;  // Get marker position from feedback
+
+        marker_pose_pub_->publish(marker_pose);
+        
+    }
+}
+
 
 std::vector<std::pair<int, int>> Planner::aStar(int start_x, int start_y, int goal_x, int goal_y){
     struct Cell {

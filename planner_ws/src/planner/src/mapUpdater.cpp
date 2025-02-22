@@ -19,7 +19,7 @@ void MapUpdater::updateGlobalMap(const nav_msgs::msg::OccupancyGrid &local_map)
     }
 }
 
-nav_msgs::msg::OccupancyGrid MapUpdater::getGlobalMap() const
+nav_msgs::msg::OccupancyGrid MapUpdater::getGlobalMap()
 {
     return global_map_;
 }

@@ -8,8 +8,8 @@ nav_msgs::msg::OccupancyGrid LaserScanProcessor::processLaserScan(const sensor_m
     rclcpp::Clock clock(RCL_SYSTEM_TIME);
     local_map.header.frame_id = "local_map";
     local_map.header.stamp = clock.now();
-    local_map.info.width = 40;
-    local_map.info.height = 40;
+    local_map.info.width = 100;
+    local_map.info.height = 100;
     local_map.info.resolution = 0.1; // 10 cm per cell
     local_map.data.resize(local_map.info.width * local_map.info.height, 0);
 
@@ -21,9 +21,9 @@ nav_msgs::msg::OccupancyGrid LaserScanProcessor::processLaserScan(const sensor_m
         {
             int x = static_cast<int>((range * cos(angle)) / local_map.info.resolution) + 50;
             int y = static_cast<int>((range * sin(angle)) / local_map.info.resolution) + 50;
-            if (x >= 0 && x < 40 && y >= 0 && y < 40)
+            if (x >= 0 && x < 100 && y >= 0 && y < 100)
             {
-                local_map.data[y * 40 + x] = 100;
+                local_map.data[y * 100 + x] = 100;
             }
         }
         angle += scan->angle_increment;

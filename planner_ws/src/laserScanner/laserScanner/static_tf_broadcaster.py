@@ -37,7 +37,6 @@ class StaticFramePublisher(Node):
 
         # Broadcast both transforms
         self.tf_broadcaster.sendTransform([gmap_to_base, base_to_laser])
-        self.get_logger().info('Published static transforms.')
 
 
 def main(args=None):
